@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "nume": "Masă din lemn masiv",
+    "descriere": "Masă extensibilă din stejar, ideală pentru sufragerie.",
+    "pret": 1200,
+    "imagine": "/images/masa.jpg"
+  },
+  {
+    "id": 2,
+    "nume": "Dulap modern alb",
+    "descriere": "Dulap cu 3 uși glisante și oglindă.",
+    "pret": 1800,
+    "imagine": "/images/dulap.jpg"
+  },
+  {
+    "id": 3,
+    "nume": "Comodă TV",
+    "descriere": "Comodă din PAL cu sertare și spațiu pentru media.",
+    "pret": 750,
+    "imagine": "/images/commoda.jpg"
+  }
+]
