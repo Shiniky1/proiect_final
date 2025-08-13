@@ -5,18 +5,16 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-// câmpuri formular
 const produs = ref('')
 const nume = ref('')
 const telefon = ref('')
 const email = ref('')
 const mesaj = ref('')
-const schite = ref([]) // [{ name, data }]
+const schite = ref([])
 
 const succes = ref(false)
 const eroare = ref('')
 
-// precompletare produs din query: /oferta?produs=Nume
 onMounted(() => {
   if (route.query.produs) produs.value = String(route.query.produs)
 })
@@ -63,7 +61,7 @@ function trimite() {
     telefon: telefon.value,
     email: email.value,
     mesaj: mesaj.value,
-    schite: schite.value, // array cu imagini
+    schite: schite.value,
     createdAt: new Date().toISOString()
   }
   try {
@@ -71,7 +69,6 @@ function trimite() {
     list.push(oferta)
     localStorage.setItem('oferte', JSON.stringify(list))
     succes.value = true
-    // reset câmpuri
     mesaj.value = ''
     schite.value = []
   } catch {
@@ -89,68 +86,76 @@ function mergiAcasa() {
     <h1 class="text-2xl font-bold mb-4">Cere o ofertă</h1>
 
     <div class="grid gap-6">
-      <!-- ghid scurt -->
-      <div class="p-4 rounded border bg-gray-50">
+      <div class="card p-4">
         <p class="font-medium mb-2">Ghid schiță (scurt):</p>
-        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+        <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
           <li>Măsoară pereții (lungime/înălțime).</li>
           <li>Desenează o schiță simplă cu dimensiuni.</li>
           <li>Fă 2–3 poze ale spațiului.</li>
         </ul>
       </div>
 
-      <div class="p-4 rounded border">
+      <div class="card p-4">
         <div class="grid md:grid-cols-2 gap-4">
           <div class="col-span-2">
-            <label class="block text-sm mb-1">Produs / Proiect</label>
-            <input v-model="produs" type="text" class="w-full border rounded p-2"
-              placeholder="Ex: Dulap dormitor Model X" />
+            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Produs / Proiect</label>
+            <input v-model="produs" type="text" class="input" placeholder="Ex: Dulap dormitor Model X" />
           </div>
 
           <div>
-            <label class="block text-sm mb-1">Nume *</label>
-            <input v-model="nume" type="text" class="w-full border rounded p-2" />
+            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Nume *</label>
+            <input v-model="nume" type="text" class="input" />
           </div>
 
           <div>
-            <label class="block text-sm mb-1">Telefon *</label>
-            <input v-model="telefon" type="tel" class="w-full border rounded p-2" placeholder="07xxxxxxxx" />
+            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Telefon *</label>
+            <input v-model="telefon" type="tel" class="input" placeholder="07xxxxxxxx" />
           </div>
 
           <div>
-            <label class="block text-sm mb-1">Email</label>
-            <input v-model="email" type="email" class="w-full border rounded p-2" placeholder="optional" />
+            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Email</label>
+            <input v-model="email" type="email" class="input" placeholder="optional" />
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-sm mb-1">Mesaj</label>
-            <textarea v-model="mesaj" rows="4" class="w-full border rounded p-2"
+            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Mesaj</label>
+            <textarea v-model="mesaj" rows="4" class="input"
               placeholder="Dimensiuni aproximative, preferințe materiale/culori..."></textarea>
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-sm mb-2">Încarcă schițe (JPG/JPEG, max 10MB fiecare)</label>
-            <input type="file" accept=".jpg,.jpeg" multiple @change="onFileChange" />
+            <label class="block text-sm mb-2 text-gray-800 dark:text-gray-300">
+              Încarcă schițe (JPG/JPEG, max 10MB fiecare)
+            </label>
+            <input
+              type="file"
+              accept=".jpg,.jpeg"
+              multiple
+              @change="onFileChange"
+              class="text-gray-900 dark:text-gray-100"
+            />
 
             <div v-if="schite.length" class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div v-for="(s, i) in schite" :key="i" class="relative">
-                <img :src="s.data" :alt="s.name"
-                  class="h-40 w-full object-contain border rounded p-2 bg-gray-50" />
-                <button @click="removeSchita(i)"
+                <img
+                  :src="s.data"
+                  :alt="s.name"
+                  class="h-40 w-full object-contain border rounded p-2 bg-white dark:bg-gray-900 dark:border-gray-700"
+                />
+                <button
+                  @click="removeSchita(i)"
                   class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700"
-                  title="Șterge">
-                  ✕
-                </button>
-                <p class="mt-1 text-xs text-gray-600 truncate">{{ s.name }}</p>
+                  title="Șterge"
+                >✕</button>
+                <p class="mt-1 text-xs text-gray-600 dark:text-gray-300 truncate">{{ s.name }}</p>
               </div>
             </div>
           </div>
         </div>
 
         <div class="mt-4 flex gap-2">
-          <button @click="trimite" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Trimite
-            cererea</button>
-          <button @click="mergiAcasa" class="px-4 py-2 border rounded">Înapoi</button>
+          <button @click="trimite" class="btn-primary">Trimite cererea</button>
+          <button @click="mergiAcasa" class="btn-outline">Înapoi</button>
         </div>
 
         <p v-if="eroare" class="mt-3 text-sm text-red-600">{{ eroare }}</p>

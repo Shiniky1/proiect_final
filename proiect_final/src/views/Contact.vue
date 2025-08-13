@@ -23,20 +23,24 @@ function trimiteMesaj() {
     <h1 class="text-3xl font-bold text-center">Contactează-ne</h1>
 
     <!-- Informații de contact -->
-    <div class="grid md:grid-cols-3 gap-8 text-center">
-      <div>
-        <p class="text-lg font-semibold">Telefon</p>
-        <p class="text-gray-600">+40 7xx xxx xxx</p>
-      </div>
-      <div>
-        <p class="text-lg font-semibold">Email</p>
-        <p class="text-gray-600">contact@stomobdesign.ro</p>
-      </div>
-      <div>
-        <p class="text-lg font-semibold">Adresă</p>
-        <p class="text-gray-600">Str. Exemplu nr. 10, București</p>
-      </div>
-    </div>
+<div class="grid md:grid-cols-3 gap-8 text-center">
+  <div>
+    <i class="fas fa-phone fa-2x text-blue-600 mb-2"></i>
+    <p class="text-lg font-semibold">Telefon</p>
+    <p class="text-gray-600">+40 7xx xxx xxx</p>
+  </div>
+  <div>
+    <i class="fas fa-envelope fa-2x text-green-600 mb-2"></i>
+    <p class="text-lg font-semibold">Email</p>
+    <p class="text-gray-600">contact@stomobdesign.ro</p>
+  </div>
+  <div>
+    <i class="fas fa-map-marker-alt fa-2x text-red-600 mb-2"></i>
+    <p class="text-lg font-semibold">Adresă</p>
+    <p class="text-gray-600">Str. Exemplu nr. 10, București</p>
+  </div>
+</div>
+
 
     <!-- Social media -->
     <div class="flex justify-center gap-6">
