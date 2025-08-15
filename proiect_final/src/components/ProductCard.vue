@@ -1,33 +1,28 @@
 <template>
-  <div class="border p-4 rounded shadow hover:shadow-md transition flex flex-col">
-    <h2 class="text-xl font-semibold">{{ produs.nume }}</h2>
-    <img :src="produs.imagine" alt="" class="w-full h-48 object-contain rounded bg-gray-100" />
+  <div class="card p-3 flex flex-col">
+    <div class="aspect-[4/3] bg-white dark:bg-gray-900 border dark:border-gray-700 rounded mb-3 overflow-hidden">
+      <img :src="produs.imagine" :alt="produs.nume" class="w-full h-full object-cover" />
+    </div>
 
-    <p class="text-gray-600">{{ produs.descriere }}</p>
-    <p class="font-bold mt-2">{{ produs.pret }} RON</p>
+    <h3 class="font-semibold text-base mb-1">{{ produs.nume }}</h3>
+    <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">{{ produs.descriere }}</p>
+    <div class="font-bold mb-3">{{ produs.pret }} RON</div>
 
-    <!-- Buton Adaugă în coș -->
-    <button @click="addToCart(produs)" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      Adaugă în coș
-    </button>
-    <router-link
-  :to="`/oferta?produs=${encodeURIComponent(produs.nume || '')}`"
-  class="mt-2 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900"
->
-  Cere ofertă
-</router-link>
+    <div class="mt-auto grid grid-cols-2 gap-2">
+      <button class="btn-outline" @click="$emit('add-to-cart', produs)">Adaugă în coș</button>
+      <RouterLink
+        :to="`/oferta?produs=${encodeURIComponent(produs.nume)}`"
+        class="btn-primary text-center"
+      >
+        Cere ofertă
+      </RouterLink>
+    </div>
   </div>
 </template>
 
 <script setup>
-// primește prop produs
 defineProps({
-  produs: {
-    type: Object,
-    required: true
-  }
+  produs: { type: Object, required: true }
 })
-
-// import funcție din utilitarul coșului
-import { addToCart } from '@/utils/cart'
+defineEmits(['add-to-cart'])
 </script>

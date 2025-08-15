@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 
-// câmpuri formular
 const nume = ref('')
 const email = ref('')
 const mesaj = ref('')
@@ -9,7 +8,6 @@ const trimis = ref(false)
 
 function trimiteMesaj() {
   if (!nume.value || !email.value || !mesaj.value) return
-  // momentan doar simulăm trimiterea
   trimis.value = true
   nume.value = ''
   email.value = ''
@@ -18,85 +16,73 @@ function trimiteMesaj() {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto p-6 space-y-12">
-    <!-- Titlu -->
-    <h1 class="text-3xl font-bold text-center">Contactează-ne</h1>
+  <div class="max-w-6xl mx-auto p-6 space-y-10">
+    <h1 class="text-3xl font-bold text-center">Contact</h1>
 
-    <!-- Informații de contact -->
-<div class="grid md:grid-cols-3 gap-8 text-center">
-  <div>
-    <i class="fas fa-phone fa-2x text-blue-600 mb-2"></i>
-    <p class="text-lg font-semibold">Telefon</p>
-    <p class="text-gray-600">+40 7xx xxx xxx</p>
-  </div>
-  <div>
-    <i class="fas fa-envelope fa-2x text-green-600 mb-2"></i>
-    <p class="text-lg font-semibold">Email</p>
-    <p class="text-gray-600">contact@stomobdesign.ro</p>
-  </div>
-  <div>
-    <i class="fas fa-map-marker-alt fa-2x text-red-600 mb-2"></i>
-    <p class="text-lg font-semibold">Adresă</p>
-    <p class="text-gray-600">Str. Exemplu nr. 10, București</p>
-  </div>
-</div>
-
-
-    <!-- Social media -->
-    <div class="flex justify-center gap-6">
-      <a href="https://facebook.com" target="_blank" class="text-blue-600 hover:scale-110 transition">
-        <i class="fab fa-facebook fa-2x"></i>
-      </a>
-      <a href="https://instagram.com" target="_blank" class="text-pink-600 hover:scale-110 transition">
-        <i class="fab fa-instagram fa-2x"></i>
-      </a>
-    </div>
-
-    <!-- Hartă -->
-    <div class="rounded overflow-hidden shadow">
+    <div class="card p-0 overflow-hidden">
       <iframe
-  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2821.642702509314!2d25.94580117640427!3d44.5614431710726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1f8a2a6a26e6f%3A0x5c7fbb65d0a8e10!2sBuftea!5e0!3m2!1sro!2sro!4v1691849723456!5m2!1sro!2sro"
-  width="100%"
-  height="300"
-  style="border:0;"
-  allowfullscreen=""
-  loading="lazy"
-  referrerpolicy="no-referrer-when-downgrade">
-</iframe>
-
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2821.642702509314!2d25.94580117640427!3d44.5614431710726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1f8a2a6a26e6f%3A0x5c7fbb65d0a8e10!2sBuftea!5e0!3m2!1sro!2sro!4v1691849723456!5m2!1sro!2sro"
+        width="100%" height="280" style="border:0" allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
     </div>
 
-    <!-- Formular -->
-    <div class="bg-gray-50 p-6 rounded shadow max-w-2xl mx-auto">
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="card p-4 flex flex-col items-center text-center gap-2">
+        <i class="fas fa-phone fa-lg text-blue-600"></i>
+        <p class="font-semibold">Telefon</p>
+        <p class="text-sm text-gray-700 dark:text-gray-300">+40 7xx xxx xxx</p>
+      </div>
+      <div class="card p-4 flex flex-col items-center text-center gap-2">
+        <i class="fas fa-envelope fa-lg text-green-600"></i>
+        <p class="font-semibold">Email</p>
+        <p class="text-sm text-gray-700 dark:text-gray-300">contact@stomobdesign.ro</p>
+      </div>
+      <div class="card p-4 flex flex-col items-center text-center gap-2">
+        <i class="fas fa-location-dot fa-lg text-red-600"></i>
+        <p class="font-semibold">Adresă</p>
+        <p class="text-sm text-gray-700 dark:text-gray-300">Buftea, Ilfov</p>
+      </div>
+    </div>
+
+    <div class="card p-6 max-w-2xl mx-auto w-full">
       <h2 class="text-2xl font-bold mb-4">Trimite-ne un mesaj</h2>
       <div class="space-y-4">
-        <input v-model="nume" type="text" placeholder="Nume" class="w-full border p-2 rounded" />
-        <input v-model="email" type="email" placeholder="Email" class="w-full border p-2 rounded" />
-        <textarea v-model="mesaj" rows="4" placeholder="Mesaj" class="w-full border p-2 rounded"></textarea>
-        <button @click="trimiteMesaj" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Trimite
-        </button>
+        <input v-model="nume" type="text" placeholder="Nume" class="input" />
+        <input v-model="email" type="email" placeholder="Email" class="input" />
+        <textarea v-model="mesaj" rows="4" placeholder="Mesaj" class="input"></textarea>
+        <button @click="trimiteMesaj" class="btn-primary">Trimite</button>
         <p v-if="trimis" class="text-green-600 text-sm mt-2">Mesaj trimis cu succes!</p>
       </div>
     </div>
 
-    <!-- Ghid colaborare -->
-    <div class="grid md:grid-cols-4 gap-6 text-center mt-10">
+    <div class="flex justify-center gap-8">
+      <a href="https://facebook.com" target="_blank" rel="noopener"
+         class="flex items-center gap-2 text-blue-600 hover:opacity-80 transition">
+        <i class="fab fa-facebook fa-lg"></i><span class="font-medium">Facebook</span>
+      </a>
+      <a href="https://instagram.com" target="_blank" rel="noopener"
+         class="flex items-center gap-2 text-pink-600 hover:opacity-80 transition">
+        <i class="fab fa-instagram fa-lg"></i><span class="font-medium">Instagram</span>
+      </a>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-6 text-center">
       <div>
         <p class="text-2xl font-bold">1</p>
-        <p class="text-gray-600">Ne contactezi</p>
+        <p class="text-gray-700 dark:text-gray-300">Ne contactezi</p>
       </div>
       <div>
         <p class="text-2xl font-bold">2</p>
-        <p class="text-gray-600">Facem măsurători</p>
+        <p class="text-gray-700 dark:text-gray-300">Facem măsurători</p>
       </div>
       <div>
         <p class="text-2xl font-bold">3</p>
-        <p class="text-gray-600">Realizăm proiectul</p>
+        <p class="text-gray-700 dark:text-gray-300">Realizăm proiectul</p>
       </div>
       <div>
         <p class="text-2xl font-bold">4</p>
-        <p class="text-gray-600">Livrare & montaj</p>
+        <p class="text-gray-700 dark:text-gray-300">Livrare & montaj</p>
       </div>
     </div>
   </div>
