@@ -1,91 +1,135 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-
-const oferte = ref([])
-const selectImg = ref(null) // preview mare
-
-function load() {
-  try {
-    const list = JSON.parse(localStorage.getItem('oferte') || '[]')
-    oferte.value = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  } catch {
-    oferte.value = []
-  }
-}
-
-function removeOferta(id) {
-  const list = oferte.value.filter(o => o.id !== id)
-  localStorage.setItem('oferte', JSON.stringify(list))
-  oferte.value = list
-}
-
-onMounted(load)
-</script>
-
 <template>
-  <div class="max-w-6xl mx-auto p-4">
-    <div class="flex items-end justify-between mb-4">
-      <h1 class="text-2xl font-bold">Oferte primite</h1>
-      <span class="text-sm text-gray-500">Total: {{ oferte.length }}</span>
-    </div>
+  <div class="p-6 max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Oferte primite</h1>
 
-    <div v-if="!oferte.length" class="p-6 text-center border rounded">
-      Nu există oferte salvate.
-    </div>
+    <div class="grid lg:grid-cols-12 gap-6">
+      <!-- sidebar filtre -->
+      <aside class="lg:col-span-3 card p-4 h-fit lg:sticky lg:top-20">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Căutare</label>
+            <input v-model.trim="filters.q" type="text" class="input" placeholder="Nume sau produs" />
+          </div>
 
-    <div v-else class="grid md:grid-cols-2 gap-4">
-      <div v-for="o in oferte" :key="o.id" class="border rounded p-4 space-y-2">
-        <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-500">{{ new Date(o.createdAt).toLocaleString() }}</div>
-          <button @click="removeOferta(o.id)" class="px-3 py-1 border rounded text-red-600 hover:bg-red-50">
-            Șterge
-          </button>
-        </div>
+          <div>
+            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Sortare</label>
+            <select v-model="filters.sort" class="input">
+              <option value="recent">Cele mai recente</option>
+              <option value="oldest">Cele mai vechi</option>
+              <option value="nume_asc">Nume A→Z</option>
+              <option value="nume_desc">Nume Z→A</option>
+              <option value="produs_asc">Produs A→Z</option>
+              <option value="produs_desc">Produs Z→A</option>
+            </select>
+          </div>
 
-        <div class="font-semibold">{{ o.produs || '—' }}</div>
-
-        <div class="grid sm:grid-cols-2 gap-2 text-sm">
-          <div><span class="font-medium">Nume:</span> {{ o.nume }}</div>
-          <div><span class="font-medium">Telefon:</span> {{ o.telefon }}</div>
-          <div class="sm:col-span-2 break-words">
-            <span class="font-medium">Email:</span> {{ o.email || '—' }}
+          <div class="flex gap-2">
+            <button class="btn-primary flex-1" @click="applyNow">Aplică</button>
+            <button class="btn-outline" @click="resetFilters">Reset</button>
           </div>
         </div>
+      </aside>
 
-        <div class="text-sm whitespace-pre-line bg-gray-50 p-2 rounded">
-          {{ o.mesaj || 'Fără mesaj' }}
+      <!-- listă oferte -->
+      <section class="lg:col-span-9">
+        <div v-if="!oferte.length && !loading" class="card p-6 text-center">
+          Nu există oferte salvate.
         </div>
 
-        <!-- miniaturi schițe -->
-        <div v-if="o.schite?.length" class="grid grid-cols-3 gap-2">
-          <button
-            v-for="(s, i) in o.schite"
-            :key="i"
-            class="relative group"
-            @click="selectImg = s.data"
-            title="Deschide"
-          >
-            <img :src="s.data" :alt="s.name" class="h-24 w-full object-contain border rounded p-1 bg-white" />
-            <span class="absolute bottom-1 left-1 right-1 text-[10px] bg-black/60 text-white px-1 rounded opacity-0 group-hover:opacity-100 truncate">
-              {{ s.name }}
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>
+        <div v-else>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+            Găsite: <strong>{{ filtered.length }}</strong> din {{ oferte.length }}
+          </p>
 
-    <!-- overlay preview mare -->
-    <div
-      v-if="selectImg"
-      class="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
-      @click.self="selectImg = null"
-    >
-      <div class="max-w-4xl w-full">
-        <img :src="selectImg" alt="" class="w-full max-h-[80vh] object-contain rounded shadow" />
-        <div class="mt-3 flex justify-end">
-          <button @click="selectImg = null" class="px-4 py-2 bg-white rounded">Închide</button>
+          <div v-if="!filtered.length" class="card p-6">
+            Nici o ofertă după filtrele curente.
+          </div>
+
+          <div v-else class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div v-for="of in filtered" :key="of.id" class="card p-4 space-y-2">
+              <h3 class="font-semibold text-lg">{{ of.produs || 'Produs neprecizat' }}</h3>
+              <p class="text-sm"><strong>Nume:</strong> {{ of.nume }}</p>
+              <p class="text-sm"><strong>Telefon:</strong> {{ of.telefon }}</p>
+              <p v-if="of.email" class="text-sm"><strong>Email:</strong> {{ of.email }}</p>
+              <p v-if="of.mesaj" class="text-sm">{{ of.mesaj }}</p>
+              <p class="text-xs text-gray-500">Trimis: {{ new Date(of.createdAt).toLocaleString() }}</p>
+
+              <div v-if="of.schite?.length" class="grid grid-cols-2 gap-2 mt-2">
+                <img
+                  v-for="(s, i) in of.schite"
+                  :key="i"
+                  :src="s.data"
+                  :alt="s.name"
+                  class="h-24 w-full object-cover border dark:border-gray-700 rounded"
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+
+const oferte = ref([])
+const loading = ref(true)
+
+const filters = ref({
+  q: '',
+  sort: 'recent',
+})
+
+function applyNow() {}
+function resetFilters() {
+  filters.value = { q: '', sort: 'recent' }
+}
+
+const filtered = computed(() => {
+  let list = [...oferte.value]
+
+  const q = filters.value.q.trim().toLowerCase()
+  if (q) {
+    list = list.filter(of =>
+      String(of.nume || '').toLowerCase().includes(q) ||
+      String(of.produs || '').toLowerCase().includes(q) ||
+      String(of.mesaj || '').toLowerCase().includes(q)
+    )
+  }
+
+  switch (filters.value.sort) {
+    case 'recent':
+      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      break
+    case 'oldest':
+      list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      break
+    case 'nume_asc':
+      list.sort((a, b) => String(a.nume || '').localeCompare(String(b.nume || '')))
+      break
+    case 'nume_desc':
+      list.sort((a, b) => String(b.nume || '').localeCompare(String(a.nume || '')))
+      break
+    case 'produs_asc':
+      list.sort((a, b) => String(a.produs || '').localeCompare(String(b.produs || '')))
+      break
+    case 'produs_desc':
+      list.sort((a, b) => String(b.produs || '').localeCompare(String(a.produs || '')))
+      break
+  }
+
+  return list
+})
+
+onMounted(() => {
+  try {
+    oferte.value = JSON.parse(localStorage.getItem('oferte') || '[]')
+  } catch {
+    oferte.value = []
+  } finally {
+    loading.value = false
+  }
+})
+</script>

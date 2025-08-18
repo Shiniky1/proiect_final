@@ -43,7 +43,7 @@ const routes = [
   { path: '/oferte', name: 'Oferte', component: Oferte },
 
   // ——— 404 (mereu la final)
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/NotFound.vue') },
 ]
 
 const router = createRouter({
