@@ -1,135 +1,165 @@
-<template>
-  <div class="p-6 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6">Oferte primite</h1>
-
-    <div class="grid lg:grid-cols-12 gap-6">
-      <!-- sidebar filtre -->
-      <aside class="lg:col-span-3 card p-4 h-fit lg:sticky lg:top-20">
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Căutare</label>
-            <input v-model.trim="filters.q" type="text" class="input" placeholder="Nume sau produs" />
-          </div>
-
-          <div>
-            <label class="block text-sm mb-1 text-gray-800 dark:text-gray-300">Sortare</label>
-            <select v-model="filters.sort" class="input">
-              <option value="recent">Cele mai recente</option>
-              <option value="oldest">Cele mai vechi</option>
-              <option value="nume_asc">Nume A→Z</option>
-              <option value="nume_desc">Nume Z→A</option>
-              <option value="produs_asc">Produs A→Z</option>
-              <option value="produs_desc">Produs Z→A</option>
-            </select>
-          </div>
-
-          <div class="flex gap-2">
-            <button class="btn-primary flex-1" @click="applyNow">Aplică</button>
-            <button class="btn-outline" @click="resetFilters">Reset</button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- listă oferte -->
-      <section class="lg:col-span-9">
-        <div v-if="!oferte.length && !loading" class="card p-6 text-center">
-          Nu există oferte salvate.
-        </div>
-
-        <div v-else>
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
-            Găsite: <strong>{{ filtered.length }}</strong> din {{ oferte.length }}
-          </p>
-
-          <div v-if="!filtered.length" class="card p-6">
-            Nici o ofertă după filtrele curente.
-          </div>
-
-          <div v-else class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-            <div v-for="of in filtered" :key="of.id" class="card p-4 space-y-2">
-              <h3 class="font-semibold text-lg">{{ of.produs || 'Produs neprecizat' }}</h3>
-              <p class="text-sm"><strong>Nume:</strong> {{ of.nume }}</p>
-              <p class="text-sm"><strong>Telefon:</strong> {{ of.telefon }}</p>
-              <p v-if="of.email" class="text-sm"><strong>Email:</strong> {{ of.email }}</p>
-              <p v-if="of.mesaj" class="text-sm">{{ of.mesaj }}</p>
-              <p class="text-xs text-gray-500">Trimis: {{ new Date(of.createdAt).toLocaleString() }}</p>
-
-              <div v-if="of.schite?.length" class="grid grid-cols-2 gap-2 mt-2">
-                <img
-                  v-for="(s, i) in of.schite"
-                  :key="i"
-                  :src="s.data"
-                  :alt="s.name"
-                  class="h-24 w-full object-cover border dark:border-gray-700 rounded"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 
-const oferte = ref([])
-const loading = ref(true)
+const AXIOS_BASE = import.meta.env.VITE_API_URL || 'http://localhost/sto_api'
 
-const filters = ref({
-  q: '',
-  sort: 'recent',
-})
+const loading = ref(false)
+const eroare = ref('')
+const items = ref([])
 
-function applyNow() {}
-function resetFilters() {
-  filters.value = { q: '', sort: 'recent' }
+const q = ref('')                       // căutare
+const sortBy = ref('createdAt_desc')    // sortare implicită
+const statusOpts = ['noua','in_lucru','inchisa']
+
+function fmtDate(iso) {
+  if (!iso) return ''
+  try { return new Date(iso).toLocaleString() } catch { return iso }
 }
 
-const filtered = computed(() => {
-  let list = [...oferte.value]
-
-  const q = filters.value.q.trim().toLowerCase()
-  if (q) {
-    list = list.filter(of =>
-      String(of.nume || '').toLowerCase().includes(q) ||
-      String(of.produs || '').toLowerCase().includes(q) ||
-      String(of.mesaj || '').toLowerCase().includes(q)
-    )
-  }
-
-  switch (filters.value.sort) {
-    case 'recent':
-      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      break
-    case 'oldest':
-      list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-      break
-    case 'nume_asc':
-      list.sort((a, b) => String(a.nume || '').localeCompare(String(b.nume || '')))
-      break
-    case 'nume_desc':
-      list.sort((a, b) => String(b.nume || '').localeCompare(String(a.nume || '')))
-      break
-    case 'produs_asc':
-      list.sort((a, b) => String(a.produs || '').localeCompare(String(b.produs || '')))
-      break
-    case 'produs_desc':
-      list.sort((a, b) => String(b.produs || '').localeCompare(String(a.produs || '')))
-      break
-  }
-
-  return list
-})
-
-onMounted(() => {
+async function load() {
+  loading.value = true
+  eroare.value = ''
   try {
-    oferte.value = JSON.parse(localStorage.getItem('oferte') || '[]')
-  } catch {
-    oferte.value = []
+    const { data } = await axios.get(`${AXIOS_BASE}/api/oferte`)
+    const arr = Array.isArray(data) ? data : []
+    // draft status pentru fiecare item
+    arr.forEach(o => { o._statusDraft = o.status || 'noua' })
+    items.value = arr
+  } catch (e) {
+    eroare.value = 'Nu am putut încărca ofertele.'
   } finally {
     loading.value = false
   }
+}
+
+const filtrate = computed(() => {
+  let arr = [...items.value]
+  const s = q.value.trim().toLowerCase()
+  if (s) {
+    arr = arr.filter(o =>
+      (o.nume||'').toLowerCase().includes(s) ||
+      (o.email||'').toLowerCase().includes(s) ||
+      (o.produs||'').toLowerCase().includes(s) ||
+      (o.telefon||'').toLowerCase().includes(s) ||
+      (o.status||'').toLowerCase().includes(s)
+    )
+  }
+  const [field, dir] = sortBy.value.split('_')
+  arr.sort((a,b) => {
+    const A = (a?.[field] ?? '')
+    const B = (b?.[field] ?? '')
+    return (A > B ? 1 : A < B ? -1 : 0) * (dir === 'desc' ? -1 : 1)
+  })
+  return arr
 })
+
+async function saveStatus(o){
+  try {
+    const { data } = await axios.put(`${AXIOS_BASE}/api/oferte/${o.id}`, { status: o._statusDraft })
+    o.status = data.status
+  } catch {
+    alert('Nu am putut salva statusul.')
+  }
+}
+
+async function removeOffer(o){
+  if (!confirm(`Ștergi oferta ${o.id}?`)) return
+  try {
+    await axios.delete(`${AXIOS_BASE}/api/oferte/${o.id}`)
+    items.value = items.value.filter(x => x.id !== o.id)
+  } catch {
+    alert('Nu am putut șterge oferta.')
+  }
+}
+
+onMounted(load)
 </script>
+
+<template>
+  <div class="max-w-7xl mx-auto px-4 py-6 lg:py-10">
+    <h1 class="text-2xl lg:text-3xl font-semibold mb-6">Admin · Oferte</h1>
+
+    <!-- Controls -->
+    <div class="card p-4 mb-6 grid gap-3 md:grid-cols-3">
+      <input
+        v-model.trim="q"
+        class="input w-full"
+        placeholder="Caută după nume, email, produs, telefon, status…"
+      />
+      <select v-model="sortBy" class="input">
+        <option value="createdAt_desc">Cele mai noi</option>
+        <option value="createdAt_asc">Cele mai vechi</option>
+        <option value="nume_asc">Nume A–Z</option>
+        <option value="nume_desc">Nume Z–A</option>
+        <option value="status_asc">Status A–Z</option>
+        <option value="status_desc">Status Z–A</option>
+      </select>
+      <div class="flex gap-2">
+        <button class="btn-outline" @click="load">Reîncarcă</button>
+        <span v-if="loading" class="self-center text-sm opacity-70">Se încarcă…</span>
+      </div>
+    </div>
+
+    <p v-if="eroare" class="text-red-600 mb-4">{{ eroare }}</p>
+
+    <!-- Listă -->
+    <div v-if="!loading && filtrate.length === 0" class="opacity-70">
+      Nicio ofertă găsită.
+    </div>
+
+    <div class="grid gap-4">
+      <div v-for="o in filtrate" :key="o.id" class="card p-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-800">{{ o.id }}</span>
+          <span class="font-medium">{{ o.nume }}</span>
+          <span class="text-sm opacity-75">{{ o.email }}</span>
+          <span class="text-sm opacity-75">{{ o.telefon }}</span>
+          <span class="ml-auto text-sm opacity-70">{{ fmtDate(o.createdAt) }}</span>
+        </div>
+
+        <div class="mt-2 text-sm">
+          <div><span class="opacity-70">Produs:</span> {{ o.produs }}</div>
+          <div v-if="o.mesaj"><span class="opacity-70">Mesaj:</span> {{ o.mesaj }}</div>
+          <div class="mt-1">
+            <span class="opacity-70">Status curent:</span>
+            <span class="font-medium">{{ o.status || 'noua' }}</span>
+          </div>
+        </div>
+
+        <!-- Thumbs -->
+        <div v-if="Array.isArray(o.schite) && o.schite.length" class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <a
+            v-for="(img, idx) in o.schite.slice(0,3)"
+            :key="idx"
+            :href="img"
+            target="_blank"
+            rel="noopener"
+            class="block"
+            title="Deschide imaginea"
+          >
+            <img
+  :src="img"
+  class="h-48 w-full object-contain border dark:border-gray-700 rounded bg-white dark:bg-gray-900"
+  alt="schiță"
+/>
+          </a>
+          <div v-if="o.schite.length > 3" class="text-xs opacity-70 self-center">
+            + {{ o.schite.length - 3 }} imagini
+          </div>
+        </div>
+
+        <!-- Acțiuni -->
+        <div class="mt-3 flex flex-wrap gap-2 items-center">
+          <select v-model="o._statusDraft" class="input w-40">
+            <option v-for="s in statusOpts" :key="s" :value="s">
+              {{ s }}
+            </option>
+          </select>
+          <button class="btn-outline" @click="saveStatus(o)">Salvează status</button>
+          <button class="btn-outline" @click="removeOffer(o)">Șterge</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

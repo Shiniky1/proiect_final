@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
+
+const AXIOS_BASE = import.meta.env.VITE_API_URL || 'http://localhost/sto_api'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,29 +15,29 @@ const telefon = ref('')
 const email = ref('')
 const mesaj = ref('')
 
-// imagini încărcate
-const schite = ref([]) // [{ name, data }]
+// fișiere selectate
+const files = ref([]) // [{ file, name, preview }]
 const dragging = ref(false)
 
 const succes = ref(false)
 const eroare = ref('')
 
-// precompletare: /oferta?produs=...
 onMounted(() => {
   if (route.query.produs) produs.value = String(route.query.produs)
 })
 
-// validare + citire fișiere
-function handleFiles(filesList) {
-  const files = Array.from(filesList || [])
-  for (const f of files) {
+function handleFiles(fileList) {
+  const arr = Array.from(fileList || [])
+  for (const f of arr) {
     if (!/\.jpe?g$/i.test(f.name)) { eroare.value = 'Încarcă doar JPG/JPEG.'; return }
     if (f.size > 10 * 1024 * 1024) { eroare.value = 'Maxim 10MB per fișier.'; return }
   }
-  files.forEach(f => {
-    const reader = new FileReader()
-    reader.onload = () => schite.value.push({ name: f.name, data: reader.result })
-    reader.readAsDataURL(f)
+  arr.forEach(f => {
+    files.value.push({
+      file: f,
+      name: f.name,
+      preview: URL.createObjectURL(f),
+    })
   })
 }
 
@@ -52,35 +55,36 @@ function onDrop(e) {
 }
 
 function removeSchita(i) {
-  schite.value.splice(i, 1)
+  try { URL.revokeObjectURL(files.value[i].preview) } catch {}
+  files.value.splice(i, 1)
 }
 
-function trimite() {
+async function trimite() {
   eroare.value = ''
+  succes.value = false
+
   if (!nume.value.trim() || !telefon.value.trim()) {
     eroare.value = 'Completează nume și telefon.'
     return
   }
-  const oferta = {
-    id: crypto.randomUUID(),
-    produs: produs.value.trim(),
-    nume: nume.value.trim(),
-    telefon: telefon.value.trim(),
-    email: email.value.trim(),
-    mesaj: mesaj.value.trim(),
-    schite: schite.value,
-    createdAt: new Date().toISOString()
-  }
+
+  const fd = new FormData()
+  fd.append('produs',  produs.value.trim())
+  fd.append('nume',    nume.value.trim())
+  fd.append('telefon', telefon.value.trim())
+  fd.append('email',   email.value.trim())
+  fd.append('mesaj',   mesaj.value.trim())
+  files.value.forEach(it => fd.append('schite[]', it.file, it.name))
+
   try {
-    const list = JSON.parse(localStorage.getItem('oferte') || '[]')
-    list.push(oferta)
-    localStorage.setItem('oferte', JSON.stringify(list))
+    await axios.post(`${AXIOS_BASE}/api/oferta`, fd)
     succes.value = true
     mesaj.value = ''
-    schite.value = []
+    files.value.forEach(it => { try { URL.revokeObjectURL(it.preview) } catch {} })
+    files.value = []
     setTimeout(() => succes.value = false, 4000)
-  } catch {
-    eroare.value = 'Eroare la salvare.'
+  } catch (e) {
+    eroare.value = 'Nu am putut trimite oferta. Încearcă din nou.'
   }
 }
 
@@ -92,10 +96,11 @@ function inapoi() { router.push('/') }
     <!-- titlu -->
     <header class="text-center space-y-2">
       <h1 class="text-3xl font-bold">Cere o ofertă</h1>
-      <p class="text-gray-600 dark:text-gray-400">Completează detaliile și atașează schițe (JPG). Răspundem rapid.</p>
+      <p class="text-gray-600 dark:text-gray-400">
+        Completează detaliile și atașează schițe (JPG). Răspundem rapid.
+      </p>
     </header>
 
-    <!-- ghid + formular -->
     <div class="grid lg:grid-cols-3 gap-8">
       <!-- ghid -->
       <aside class="lg:col-span-1 space-y-6">
@@ -137,7 +142,7 @@ function inapoi() { router.push('/') }
         <div class="grid md:grid-cols-2 gap-4">
           <div class="md:col-span-2">
             <label class="block text-sm mb-1">Produs / Proiect</label>
-            <input v-model="produs" type="text" class="input w-full" placeholder="Ex: Bucătărie colț, dressing, bibliotecă" />
+            <input v-model="produs" type="text" class="input w-full" />
           </div>
 
           <div>
@@ -157,7 +162,7 @@ function inapoi() { router.push('/') }
 
           <div class="md:col-span-2">
             <label class="block text-sm mb-1">Mesaj</label>
-            <textarea v-model="mesaj" rows="4" class="input w-full" placeholder="Dimensiuni, materiale/culori dorite, buget estimat..."></textarea>
+            <textarea v-model="mesaj" rows="4" class="input w-full"></textarea>
           </div>
         </div>
 
@@ -167,7 +172,7 @@ function inapoi() { router.push('/') }
 
           <div
             class="rounded-lg border-2 border-dashed dark:border-gray-700 p-6 text-center transition bg-white/60 dark:bg-gray-900/60"
-            :class="dragging ? 'border-blue-400 bg-blue-50 dark:bg-blue-950/20' : ''"
+            :class="[dragging && 'border-blue-400 bg-blue-50 dark:bg-blue-950/20']"
             @dragover.prevent="dragging = true"
             @dragleave.prevent="dragging = false"
             @drop="onDrop"
@@ -180,9 +185,9 @@ function inapoi() { router.push('/') }
             <p class="text-xs mt-2 text-gray-500">Doar JPG/JPEG • Max 10MB/fișier</p>
           </div>
 
-          <div v-if="schite.length" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div v-for="(s,i) in schite" :key="i" class="relative">
-              <img :src="s.data" :alt="s.name" class="h-40 w-full object-contain border dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800 p-2" />
+          <div v-if="files.length" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div v-for="(s,i) in files" :key="i" class="relative">
+              <img :src="s.preview" :alt="s.name" class="h-40 w-full object-contain border dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800 p-2" />
               <button @click="removeSchita(i)" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700">✕</button>
               <p class="mt-1 text-xs text-gray-600 dark:text-gray-300 truncate">{{ s.name }}</p>
             </div>
@@ -196,7 +201,7 @@ function inapoi() { router.push('/') }
         </div>
 
         <p v-if="eroare" class="text-sm text-red-600">{{ eroare }}</p>
-        <p v-if="succes" class="text-sm text-green-700">Cererea a fost salvată. Te contactăm în curând.</p>
+        <p v-if="succes" class="text-sm text-green-700">Cererea a fost trimisă. Mulțumim!</p>
       </section>
     </div>
   </div>

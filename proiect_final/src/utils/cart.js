@@ -43,3 +43,17 @@ export function cartTotal() {
   const cart = getCart()
   return cart.reduce((sum, p) => sum + Number(p.pret || 0) * (p.qty || 1), 0)
 }
+// ——— qty helpers (nou)
+export function setQty(id, qty) {
+  const cart = getCart()
+  const i = cart.findIndex(p => p.id === id)
+  if (i >= 0) {
+    cart[i].qty = Math.max(1, Number(qty) || 1)
+    saveCart(cart)
+  }
+}
+
+export function updateQty(id, qty) {
+  // alias; păstrăm numele folosit des în componente
+  setQty(id, qty)
+}
