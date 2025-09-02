@@ -14,8 +14,9 @@ function load() {
 }
 function save() {
   localStorage.setItem('cart', JSON.stringify(items.value))
-  window.dispatchEvent(new StorageEvent('storage', { key: 'cart' }))
+  window.dispatchEvent(new Event('cart-storage'))
 }
+
 
 function inc(i) {
   items.value[i].qty = Math.max(1, (items.value[i].qty || 1) + 1)
@@ -56,15 +57,20 @@ function goCheckout() {
 }
 
 function onStorage(e) {
-  if (e.key === 'cart') load()
+  if (!e || e.type === 'cart-storage' || e.key === 'cart') {
+    load()
+  }
 }
+
 
 onMounted(() => {
   load()
-  window.addEventListener('storage', onStorage)
+  window.addEventListener('storage', onStorage)        
+  window.addEventListener('cart-storage', onStorage)   
 })
 onBeforeUnmount(() => {
   window.removeEventListener('storage', onStorage)
+  window.removeEventListener('cart-storage', onStorage)
 })
 </script>
 

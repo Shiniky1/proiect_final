@@ -1,6 +1,11 @@
 // src/utils/cart.js
 
-// Citește coșul din localStorage
+// emite un eveniment custom atunci când se schimbă coșul
+function notifyCartChange() {
+  window.dispatchEvent(new Event('cart-storage'))
+}
+
+// citește coșul din localStorage
 export function getCart() {
   try {
     return JSON.parse(localStorage.getItem('cart') || '[]')
@@ -9,51 +14,54 @@ export function getCart() {
   }
 }
 
-// Salvează coșul în localStorage și notifică alte componente
-export function saveCart(cart) {
-  localStorage.setItem('cart', JSON.stringify(cart))
-  window.dispatchEvent(new Event('storage')) // anunță restul aplicației
+// scrie coșul și emite notificare
+function setCart(list) {
+  localStorage.setItem('cart', JSON.stringify(list))
+  notifyCartChange()
 }
 
-// Adaugă produs în coș
+// adaugă produs
 export function addToCart(item) {
-  const cart = getCart()
-  const index = cart.findIndex(p => p.id === item.id)
-  if (index >= 0) {
-    cart[index].qty += 1
+  const list = getCart()
+  const i = list.findIndex(p => p.id === item.id)
+  if (i !== -1) {
+    list[i].qty = (list[i].qty || 1) + (item.qty || 1)
   } else {
-    cart.push({ ...item, qty: 1 })
+    list.push({ ...item, qty: item.qty || 1 })
   }
-  saveCart(cart)
+  setCart(list)
 }
 
-// Șterge un produs din coș
+// șterge produs
 export function removeFromCart(id) {
-  const cart = getCart().filter(p => p.id !== id)
-  saveCart(cart)
+  const list = getCart().filter(p => p.id !== id)
+  setCart(list)
 }
 
-// Golește tot coșul
-export function clearCart() {
-  saveCart([])
-}
-
-// Calculează totalul în RON
-export function cartTotal() {
-  const cart = getCart()
-  return cart.reduce((sum, p) => sum + Number(p.pret || 0) * (p.qty || 1), 0)
-}
-// ——— qty helpers (nou)
+// setează cantitate
 export function setQty(id, qty) {
-  const cart = getCart()
-  const i = cart.findIndex(p => p.id === id)
-  if (i >= 0) {
-    cart[i].qty = Math.max(1, Number(qty) || 1)
-    saveCart(cart)
+  const list = getCart()
+  const i = list.findIndex(p => p.id === id)
+  if (i !== -1) {
+    list[i].qty = Math.max(1, Number(qty) || 1)
+    setCart(list)
   }
 }
 
-export function updateQty(id, qty) {
-  // alias; păstrăm numele folosit des în componente
-  setQty(id, qty)
+// alias pentru compatibilitate
+export const updateQty = setQty
+
+// golește coșul
+export function clearCart() {
+  setCart([])
+}
+
+// număr total produse
+export function cartCount() {
+  return getCart().reduce((s, p) => s + (p.qty || 1), 0)
+}
+
+// total RON
+export function cartTotal() {
+  return getCart().reduce((s, p) => s + Number(p.pret || 0) * (p.qty || 1), 0)
 }
