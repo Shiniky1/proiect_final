@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
+import axios from "axios";
+const AXIOS_BASE = import.meta.env.VITE_API_URL || "http://localhost:5174";
 
-const AXIOS_BASE = import.meta.env.VITE_API_URL || 'http://localhost/sto_api'
 
 const loading = ref(false)
 const eroare = ref('')

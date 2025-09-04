@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import axios from "axios";
+const AXIOS_BASE = import.meta.env.VITE_API_URL || "http://localhost:5174";
 
-const AXIOS_BASE = import.meta.env.VITE_API_URL || 'http://localhost/sto_api'
 
 const route = useRoute()
 const router = useRouter()
@@ -60,33 +60,23 @@ function removeSchita(i) {
 }
 
 async function trimite() {
-  eroare.value = ''
-  succes.value = false
-
-  if (!nume.value.trim() || !telefon.value.trim()) {
-    eroare.value = 'Completează nume și telefon.'
-    return
-  }
-
-  const fd = new FormData()
-  fd.append('produs',  produs.value.trim())
-  fd.append('nume',    nume.value.trim())
-  fd.append('telefon', telefon.value.trim())
-  fd.append('email',   email.value.trim())
-  fd.append('mesaj',   mesaj.value.trim())
-  files.value.forEach(it => fd.append('schite[]', it.file, it.name))
-
   try {
-    await axios.post(`${AXIOS_BASE}/api/oferta`, fd)
-    succes.value = true
-    mesaj.value = ''
-    files.value.forEach(it => { try { URL.revokeObjectURL(it.preview) } catch {} })
-    files.value = []
-    setTimeout(() => succes.value = false, 4000)
+    await axios.post(`${AXIOS_BASE}/api/oferta`, {
+      produs: produs.value,
+      nume: nume.value,
+      telefon: telefon.value,
+      email: email.value,
+      mesaj: mesaj.value,
+      schite: [] // ignorăm temporar fișierele
+    });
+    alert("Oferta a fost trimisă!");
+    // reset minim
+    produs.value = ""; nume.value = ""; telefon.value = ""; email.value = ""; mesaj.value = "";
   } catch (e) {
-    eroare.value = 'Nu am putut trimite oferta. Încearcă din nou.'
+    alert("Eroare la trimitere ofertă");
   }
 }
+
 
 function inapoi() { router.push('/') }
 </script>

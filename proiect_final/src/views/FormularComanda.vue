@@ -1,10 +1,9 @@
 <script setup>
 import { reactive, ref, computed, onMounted, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import { getCart, clearCart, removeFromCart, setQty } from '@/utils/cart'
-
-const AXIOS_BASE = import.meta.env.VITE_API_URL || 'http://localhost/sto_api'
+import axios from "axios";
+const AXIOS_BASE = import.meta.env.VITE_API_URL || "http://localhost:5174";
 const router = useRouter()
 
 // state formular
