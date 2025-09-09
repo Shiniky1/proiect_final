@@ -10,6 +10,35 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// === Products API ===
+
+// GET /api/products - listă produse
+app.get('/api/products', async (_req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, nume, pret, descriere, imagine, createdAt FROM products ORDER BY createdAt DESC'
+    );
+    res.json(rows);
+  } catch (e: any) {
+    res.status(500).json({ error: 'DB error', message: e.message });
+  }
+});
+
+// GET /api/products/:id - detaliu produs
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, nume, pret, descriere, imagine, createdAt FROM products WHERE id = ?',
+      [req.params.id]
+    );
+    const arr = Array.isArray(rows) ? rows : [];
+    if (!arr.length) return res.status(404).json({ error: 'Not found' });
+    res.json(arr[0]);
+  } catch (e: any) {
+    res.status(500).json({ error: 'DB error', message: e.message });
+  }
+});
+
 // test server
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
@@ -107,6 +136,19 @@ app.post("/api/orders", async (req, res) => {
 
   const [rows] = await pool.query("SELECT * FROM orders WHERE id=:id", { id });
   res.status(201).json((rows as any)[0]);
+});
+// PUT /api/orders/:id
+app.put('/api/orders/:id', async (req, res) => {
+  const { status } = req.body;
+  try {
+    const [result] = await pool.query(
+      'UPDATE orders SET status = ? WHERE id = ?',
+      [status, req.params.id]
+    );
+    res.json({ id: req.params.id, status });
+  } catch (e:any) {
+    res.status(500).json({ error: 'DB error', message: e.message });
+  }
 });
 
 const PORT = Number(process.env.PORT || 5174);

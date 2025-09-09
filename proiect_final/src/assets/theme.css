@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer components {
+  /* ---- Componente de bază ---- */
   .card {
     @apply rounded border bg-white text-gray-900
            dark:bg-gray-800 dark:text-[#F5E9DD] dark:border-gray-700;
@@ -14,15 +15,54 @@
            dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400 dark:border-gray-700;
   }
 
+  /* ---- Butoane ---- */
   .btn-primary {
-    @apply px-4 py-2 rounded
-           bg-blue-600 text-white hover:bg-blue-700
-           dark:bg-blue-500 dark:hover:bg-blue-600;
+    @apply px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition;
   }
 
   .btn-outline {
     @apply px-4 py-2 rounded border
            border-gray-300 text-gray-800 hover:bg-gray-100
            dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800;
+  }
+
+  /* ---- Linkuri ---- */
+  .nav-link {
+    @apply text-amber-800 hover:text-amber-900
+           dark:text-gray-300 dark:hover:text-white transition;
+  }
+  .nav-link-strong {
+    @apply text-amber-800 font-semibold transition;
+  }
+
+  /* ---- Fundaluri wood ---- */
+  .wood-bg-footer {
+    background-color:#F5F1E6;
+    background-image:
+      repeating-linear-gradient(90deg,rgba(169,113,66,.06) 0,rgba(169,113,66,.06) 2px,transparent 2px,transparent 6px),
+      linear-gradient(0deg,rgba(169,113,66,.05),rgba(169,113,66,.02) 60%,rgba(169,113,66,.05)),
+      linear-gradient(#F5F1E6,#F5F1E6);
+  }
+  .dark .wood-bg-footer {
+    background-color:#2A1B14;
+    background-image:
+      repeating-linear-gradient(90deg,rgba(193,135,90,.10) 0,rgba(193,135,90,.10) 2px,transparent 2px,transparent 6px),
+      linear-gradient(0deg,rgba(161,113,77,.12),rgba(161,113,77,.06) 60%,rgba(161,113,77,.12)),
+      linear-gradient(#2A1B14,#2A1B14);
+  }
+
+  .wood-bg-navbar {
+    background-color:#F5F1E6;
+    background-image:
+      repeating-linear-gradient(90deg,rgba(169,113,66,.06) 0,rgba(169,113,66,.06) 2px,transparent 2px,transparent 6px),
+      linear-gradient(0deg,rgba(169,113,66,.05),rgba(169,113,66,.02) 60%,rgba(169,113,66,.05)),
+      linear-gradient(#F5F1E6,#F5F1E6);
+  }
+  .dark .wood-bg-navbar {
+    background-color:#2A1B14;
+    background-image:
+      repeating-linear-gradient(90deg,rgba(193,135,90,.10) 0,rgba(193,135,90,.10) 2px,transparent 2px,transparent 6px),
+      linear-gradient(0deg,rgba(161,113,77,.12),rgba(161,113,77,.06) 60%,rgba(161,113,77,.12)),
+      linear-gradient(#2A1B14,#2A1B14);
   }
 }

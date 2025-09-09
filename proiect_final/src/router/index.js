@@ -14,10 +14,8 @@ import Cart from '@/views/Cart.vue'
 import Oferta from '@/views/Oferta.vue'
 import FormularComanda from '@/views/FormularComanda.vue'
 
-// --- User / Auth / Admin
+// --- Auth / Admin
 import Login from '@/views/Login.vue'
-import Register from '@/views/Register.vue'
-import UserPanel from '@/views/UserPanel.vue'
 import AdminComenzi from '@/views/AdminComenzi.vue'
 import Oferte from '@/views/Oferte.vue'                 // Admin · Oferte (listă cereri)
 
@@ -39,10 +37,9 @@ const routes = [
   { path: '/oferta', name: 'Oferta', component: Oferta },
   { path: '/comanda', name: 'FormularComanda', component: FormularComanda },
 
-  // User / Auth
+  // Auth
   { path: '/login', name: 'Login', component: Login },
-  { path: '/register', name: 'Register', component: Register },
-  { path: '/user', name: 'UserPanel', component: UserPanel },
+
 
   // Admin (protejat)
   { path: '/admin/oferte', name: 'AdminOferte', component: Oferte, meta: { requiresAdmin: true } },

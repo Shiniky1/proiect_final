@@ -14,7 +14,7 @@
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
             <RouterLink to="/catalog" class="btn-primary text-center">Vezi catalogul</RouterLink>
-            <RouterLink to="/oferta" class="btn-secondary text-center">Cere o ofertă</RouterLink>
+            <RouterLink to="/oferta" class="btn-primary text-center">Cere o ofertă</RouterLink>
           </div>
         </div>
         <div class="relative rounded-xl overflow-hidden workshop-shadow">
@@ -99,4 +99,5 @@
 <style scoped>
 .workshop-shadow { box-shadow: 0 12px 30px rgba(0,0,0,.08), 0 2px 10px rgba(0,0,0,.06); }
 .text-text-secondary { color: var(--color-text-secondary, #6B4E3D); }
+
 </style>
