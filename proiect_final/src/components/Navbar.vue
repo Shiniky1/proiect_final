@@ -5,40 +5,23 @@ import { getTheme, toggleTheme } from '@/utils/theme'
 import { getUser, isAdmin, logout } from '@/utils/auth'
 
 const mode = ref('light')
-const cartCount = ref(0)
+
 const user = ref(getUser())
 const admin = ref(isAdmin())
 
-function loadCartCount() {
-  try {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]')
-    cartCount.value = Array.isArray(cart) ? cart.reduce((s, it) => s + (it.qty || 1), 0) : 0
-  } catch { cartCount.value = 0 }
-}
+
 function refreshAuth() {
   user.value = getUser()
   admin.value = isAdmin()
 }
-function onStorage(e) {
-  if (!e || e.type === 'cart-storage' || e.key === 'cart') loadCartCount()
-}
+
 function onAuthChanged() {
   refreshAuth()
 }
 
-onMounted(() => {
-  loadCartCount()
-  refreshAuth()
-  window.addEventListener('storage', onStorage)
-  window.addEventListener('cart-storage', onStorage)
-  window.addEventListener('auth-changed', onAuthChanged)
-  mode.value = getTheme()
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('storage', onStorage)
-  window.removeEventListener('cart-storage', onStorage)
-  window.removeEventListener('auth-changed', onAuthChanged)
-})
+
+
+
 </script>
 
 <template>
@@ -87,31 +70,13 @@ onBeforeUnmount(() => {
               :class="$route.path.startsWith('/admin/oferte') ? 'active' : ''"
             >Admin · Oferte</RouterLink>
 
-            <RouterLink
-              to="/admin/comenzi"
-              class="nav-link"
-              :class="$route.path.startsWith('/admin/comenzi') ? 'active' : ''"
-            >Admin · Comenzi</RouterLink>
+           
           </template>
         </div>
 
         <!-- acțiuni -->
         <div class="flex items-center gap-2 sm:gap-3">
-          <RouterLink
-            to="/cart"
-            class="relative inline-flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            :class="$route.path.startsWith('/cart') ? 'ring-2 ring-amber-300' : ''"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-              class="h-5 w-5 fill-current text-gray-700 dark:text-gray-300" aria-hidden="true">
-              <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 .001 4A2 2 0 0 0 17 18ZM3 4h2l2.4 9.6A3 3 0 0 0 10.3 16H18a3 3 0 0 0 2.9-2.2l1.6-6A1 1 0 0 0 21.6 6H6.2l-.5-2H3Z"/>
-            </svg>
-            <span class="text-sm font-medium">Coș</span>
-            <span v-if="cartCount"
-              class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full text-xs font-bold bg-amber-600 text-white flex items-center justify-center">
-              {{ cartCount }}
-            </span>
-          </RouterLink>
+          
 
           <button
             @click="mode = toggleTheme()"
@@ -143,7 +108,7 @@ onBeforeUnmount(() => {
         <RouterLink to="/contact" class="nav-link">Contact</RouterLink>
         <RouterLink to="/oferta" class="nav-link-strong">Cere ofertă</RouterLink>
         <RouterLink v-if="admin" to="/admin/oferte" class="nav-link">Admin · Oferte</RouterLink>
-        <RouterLink v-if="admin" to="/admin/comenzi" class="nav-link">Admin · Comenzi</RouterLink>
+       
       </div>
     </div>
   </nav>

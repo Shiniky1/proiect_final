@@ -10,20 +10,25 @@
       <img
         :src="produs.imagine"
         :alt="produs.nume"
-        class="w-full h-64 object-cover rounded border dark:border-gray-700"
+        class="w-full h-72 object-cover rounded border dark:border-gray-700"
       />
       <h1 class="text-3xl font-bold">{{ produs.nume }}</h1>
-      <p class="text-gray-700 dark:text-gray-300">{{ produs.descriere }}</p>
-      <p class="text-2xl font-semibold text-amber-700">
-        {{ fmtPret(produs.pret) }} RON
+
+      <div class="flex gap-2 text-xs opacity-80">
+        <span v-if="produs.categorie" class="px-2 py-1 rounded border dark:border-gray-700">{{ produs.categorie }}</span>
+        <span v-if="produs.material" class="px-2 py-1 rounded border dark:border-gray-700">{{ produs.material }}</span>
+      </div>
+
+      <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+        {{ produs.descriere }}
       </p>
 
-      <router-link
-        to="/comanda"
+      <RouterLink
+        :to="`/oferta?prod=${produs.id}&nume=${encodeURIComponent(produs.nume)}`"
         class="btn-primary inline-block"
       >
-        Comandă produsul
-      </router-link>
+        Cere ofertă
+      </RouterLink>
     </div>
 
     <div v-else class="card p-6 text-center text-red-600">
@@ -42,18 +47,12 @@ const produs = ref(null)
 const loading = ref(true)
 const eroare = ref('')
 
-const fmtPret = (n) =>
-  new Intl.NumberFormat('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n) || 0)
-
 onMounted(async () => {
   try {
     const id = route.params.id
     const { data } = await api.get(`/api/products/${id}`)
-    if (!data || !data.id) {
-      eroare.value = 'Produsul nu a fost găsit.'
-    } else {
-      produs.value = data
-    }
+    if (!data || !data.id) eroare.value = 'Produsul nu a fost găsit.'
+    else produs.value = data
   } catch (e) {
     console.error('Eroare la încărcarea produsului:', e)
     eroare.value = 'Nu am putut încărca produsul.'

@@ -1,15 +1,20 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import axios from "axios";
-const AXIOS_BASE = import.meta.env.VITE_API_URL || "http://localhost:5174";
-
+import axios from "axios"
+const AXIOS_BASE = import.meta.env.VITE_API_URL || "http://localhost:5174"
 
 const loading = ref(false)
 const eroare = ref('')
 const items = ref([])
 
-const q = ref('')                       // căutare
-const sortBy = ref('createdAt_desc')    // sortare implicită
+const q = ref('')
+const sortBy = ref('createdAt_desc')
+const tipFilter = ref('all') // 'all' | 'contact' | 'oferte'
+
+function isContactOffer(o) {
+  return typeof o?.produs === 'string' && o.produs.trim().startsWith('[CONTACT]')
+}
+
 const statusOpts = ['noua','in_lucru','inchisa']
 
 function fmtDate(iso) {
@@ -23,7 +28,7 @@ async function load() {
   try {
     const { data } = await axios.get(`${AXIOS_BASE}/api/oferte`)
     const arr = Array.isArray(data) ? data : []
-    // draft status pentru fiecare item
+    // backend-ul îți dă deja o.schite ca URL-uri corecte
     arr.forEach(o => { o._statusDraft = o.status || 'noua' })
     items.value = arr
   } catch (e) {
@@ -36,6 +41,13 @@ async function load() {
 const filtrate = computed(() => {
   let arr = [...items.value]
   const s = q.value.trim().toLowerCase()
+
+  if (tipFilter.value === 'contact') {
+    arr = arr.filter(isContactOffer)
+  } else if (tipFilter.value === 'oferte') {
+    arr = arr.filter(o => !isContactOffer(o))
+  }
+
   if (s) {
     arr = arr.filter(o =>
       (o.nume||'').toLowerCase().includes(s) ||
@@ -76,12 +88,13 @@ async function removeOffer(o){
 onMounted(load)
 </script>
 
+
 <template>
   <div class="max-w-7xl mx-auto px-4 py-6 lg:py-10">
     <h1 class="text-2xl lg:text-3xl font-semibold mb-6">Admin · Oferte</h1>
 
     <!-- Controls -->
-    <div class="card p-4 mb-6 grid gap-3 md:grid-cols-3">
+     <div class="card p-4 mb-6 grid gap-3 md:grid-cols-4">
       <input
         v-model.trim="q"
         class="input w-full"
@@ -95,6 +108,11 @@ onMounted(load)
         <option value="status_asc">Status A–Z</option>
         <option value="status_desc">Status Z–A</option>
       </select>
+      <select v-model="tipFilter" class="input">
+  <option value="all">Toate</option>
+ <option value="contact">Doar Contact</option>
+<option value="oferte">Doar Oferte</option>
+</select>
       <div class="flex gap-2">
         <button class="btn-outline" @click="load">Reîncarcă</button>
         <span v-if="loading" class="self-center text-sm opacity-70">Se încarcă…</span>
@@ -112,6 +130,13 @@ onMounted(load)
       <div v-for="o in filtrate" :key="o.id" class="card p-4">
         <div class="flex flex-wrap items-center gap-3">
           <span class="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-800">{{ o.id }}</span>
+          <span
+  v-if="isContactOffer(o)"
+  class="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded bg-amber-500/90 text-white"
+>
+  Contact
+</span>
+
           <span class="font-medium">{{ o.nume }}</span>
           <span class="text-sm opacity-75">{{ o.email }}</span>
           <span class="text-sm opacity-75">{{ o.telefon }}</span>

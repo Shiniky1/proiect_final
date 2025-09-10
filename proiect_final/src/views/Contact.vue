@@ -1,37 +1,78 @@
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
+
+const AXIOS_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5174'
 
 const nume = ref('')
 const email = ref('')
+const telefon = ref('')
 const mesaj = ref('')
+const files = ref([])          // <— aici ținem fișierele selectate
+const previews = ref([])       // pentru preview-uri în UI
+
+const sending = ref(false)
 const trimis = ref(false)
 const eroare = ref('')
 
-function trimiteMesaj() {
+function validEmail(v) { return /^\S+@\S+\.\S+$/.test(v) }
+function validPhone(v) { return /^[0-9+\s-]{7,}$/.test(v) }
+
+function onFiles(e) {
+  const list = Array.from(e.target.files || [])
+  files.value = list
+  // previews
+  previews.value = list.map(f => URL.createObjectURL(f))
+}
+
+async function trimiteMesaj() {
   eroare.value = ''
-  if (!nume.value.trim() || !email.value.trim() || !mesaj.value.trim()) {
+
+  if (!nume.value.trim() || !email.value.trim() || !telefon.value.trim() || !mesaj.value.trim()) {
     eroare.value = 'Completează toate câmpurile.'
     return
   }
-  trimis.value = true
-  nume.value = ''
-  email.value = ''
-  mesaj.value = ''
-  setTimeout(() => (trimis.value = false), 4000)
+  if (!validEmail(email.value)) { eroare.value = 'Email invalid.'; return }
+  if (!validPhone(telefon.value)) { eroare.value = 'Telefon invalid.'; return }
+
+  // IMPORTANT: folosim FormData (multipart/form-data)
+  const fd = new FormData()
+  fd.append('produs', '[CONTACT] Mesaj de pe site')
+  fd.append('nume', nume.value.trim())
+  fd.append('telefon', telefon.value.trim())
+  fd.append('email', email.value.trim())
+  fd.append('mesaj', mesaj.value.trim())
+
+  // cheie EXACTĂ “schite” – backend-ul tău așteaptă upload.array("schite", 10)
+  for (const f of files.value) {
+    fd.append('schite', f)
+  }
+
+  sending.value = true
+  try {
+    await axios.post(`${AXIOS_BASE}/api/oferta`, fd /* NU pune Content-Type manual */)
+    trimis.value = true
+    // reset
+    nume.value = ''; email.value = ''; telefon.value = ''; mesaj.value = ''
+    files.value = []; previews.value = []
+    setTimeout(() => (trimis.value = false), 4000)
+  } catch (e) {
+    console.error(e)
+    eroare.value = 'Nu am putut trimite mesajul. Încearcă din nou.'
+  } finally {
+    sending.value = false
+  }
 }
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto p-6 space-y-12">
-    <!-- titlu -->
     <header class="text-center space-y-2">
       <h1 class="text-3xl font-bold">Contactează-ne</h1>
       <p class="text-gray-600 dark:text-gray-400">Răspundem L–V, 09:00–18:00.</p>
     </header>
 
-    <!-- info + formular -->
     <div class="grid lg:grid-cols-2 gap-8">
-      <!-- info -->
       <section class="space-y-6">
         <div class="bg-white/70 dark:bg-gray-900/70 shadow rounded-lg p-6 space-y-4">
           <div class="flex items-center gap-3">
@@ -57,7 +98,6 @@ function trimiteMesaj() {
           </div>
         </div>
 
-        <!-- hartă -->
         <div class="rounded-lg overflow-hidden shadow">
           <iframe
             class="w-full h-[250px]"
@@ -67,15 +107,26 @@ function trimiteMesaj() {
         </div>
       </section>
 
-      <!-- formular -->
       <section class="bg-white/70 dark:bg-gray-900/70 shadow rounded-lg p-6">
         <h2 class="text-xl font-semibold mb-4">Trimite-ne un mesaj</h2>
         <div class="space-y-4">
           <input v-model="nume" type="text" placeholder="Nume" class="input w-full" />
           <input v-model="email" type="email" placeholder="Email" class="input w-full" />
+          <input v-model="telefon" type="text" placeholder="Telefon" class="input w-full" />
           <textarea v-model="mesaj" rows="5" placeholder="Mesaj" class="input w-full"></textarea>
+
+          <!-- input fișiere -->
+          <div class="space-y-2">
+            <input type="file" multiple accept="image/*" @change="onFiles" class="block text-sm" />
+            <div v-if="previews.length" class="grid grid-cols-3 gap-2">
+              <img v-for="(src,i) in previews" :key="i" :src="src" class="w-full h-24 object-cover rounded border dark:border-gray-700" />
+            </div>
+          </div>
+
           <div class="flex items-center gap-3">
-            <button @click="trimiteMesaj" class="btn-primary">Trimite</button>
+            <button @click="trimiteMesaj" class="btn-primary" :disabled="sending">
+              {{ sending ? 'Se trimite…' : 'Trimite' }}
+            </button>
             <p v-if="eroare" class="text-sm text-red-600">{{ eroare }}</p>
             <p v-if="trimis" class="text-sm text-green-600">Mesaj trimis. Mulțumim!</p>
           </div>
@@ -83,7 +134,6 @@ function trimiteMesaj() {
       </section>
     </div>
 
-    <!-- pași -->
     <section class="grid md:grid-cols-4 gap-6">
       <div class="bg-white/70 dark:bg-gray-900/70 p-4 rounded-lg shadow text-center">
         <h3 class="font-semibold mb-1">1. Ne contactezi</h3>

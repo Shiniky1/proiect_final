@@ -60,22 +60,44 @@ function removeSchita(i) {
 }
 
 async function trimite() {
+  eroare.value = ''
+  succes.value = false
+
+  if (!produs.value.trim() || !nume.value.trim() || !telefon.value.trim()) {
+    eroare.value = 'Completează produsul, numele și telefonul.'
+    return
+  }
+
   try {
-    await axios.post(`${AXIOS_BASE}/api/oferta`, {
-      produs: produs.value,
-      nume: nume.value,
-      telefon: telefon.value,
-      email: email.value,
-      mesaj: mesaj.value,
-      schite: [] // ignorăm temporar fișierele
-    });
-    alert("Oferta a fost trimisă!");
-    // reset minim
-    produs.value = ""; nume.value = ""; telefon.value = ""; email.value = ""; mesaj.value = "";
+    const fd = new FormData()
+    fd.append('produs', produs.value.trim())
+    fd.append('nume', nume.value.trim())
+    fd.append('telefon', telefon.value.trim())
+    fd.append('email', email.value.trim())
+    fd.append('mesaj', mesaj.value.trim())
+
+    // ATAȘEAZĂ IMAGINILE – cheia trebuie să fie EXACT "schite"
+    files.value.forEach(s => fd.append('schite', s.file))
+
+    await axios.post(`${AXIOS_BASE}/api/oferta`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+
+    succes.value = true
+    // curățare state + eliberare URL-urile de preview
+    files.value.forEach(s => { try { URL.revokeObjectURL(s.preview) } catch {} })
+    files.value = []
+    produs.value = ''
+    nume.value = ''
+    telefon.value = ''
+    email.value = ''
+    mesaj.value = ''
   } catch (e) {
-    alert("Eroare la trimitere ofertă");
+    console.error(e)
+    eroare.value = 'Nu am putut trimite oferta. Încearcă din nou.'
   }
 }
+
 
 
 function inapoi() { router.push('/') }
