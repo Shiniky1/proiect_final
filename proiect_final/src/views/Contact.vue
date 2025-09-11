@@ -86,14 +86,14 @@ async function trimiteMesaj() {
             <div class="bg-primary text-white w-10 h-10 flex items-center justify-center rounded-full">📞</div>
             <div>
               <p class="font-semibold">Telefon</p>
-              <a href="tel:+40700000000" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">+40 700 000 000</a>
+              <a href="tel:+40700000000" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">+40 769 239 869</a>
             </div>
           </div>
           <div class="flex items-center gap-3">
             <div class="bg-primary text-white w-10 h-10 flex items-center justify-center rounded-full">✉️</div>
             <div>
               <p class="font-semibold">Email</p>
-              <a href="mailto:contact@stomobdesign.ro" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">contact@stomobdesign.ro</a>
+              <a href="mailto:contact@stomobdesign.ro" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">sto.design09@gmail.com</a>
             </div>
           </div>
         </div>
@@ -116,12 +116,12 @@ async function trimiteMesaj() {
           <textarea v-model="mesaj" rows="5" placeholder="Mesaj" class="input w-full"></textarea>
 
           <!-- input fișiere -->
-          <div class="space-y-2">
+          <!-- <div class="space-y-2">
             <input type="file" multiple accept="image/*" @change="onFiles" class="block text-sm" />
             <div v-if="previews.length" class="grid grid-cols-3 gap-2">
               <img v-for="(src,i) in previews" :key="i" :src="src" class="w-full h-24 object-cover rounded border dark:border-gray-700" />
             </div>
-          </div>
+          </div> -->
 
           <div class="flex items-center gap-3">
             <button @click="trimiteMesaj" class="btn-primary" :disabled="sending">

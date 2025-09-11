@@ -20,7 +20,7 @@
         <div class="relative rounded-xl overflow-hidden workshop-shadow">
           <div class="aspect-video bg-gradient-to-br from-[rgba(139,69,19,.12)] to-[rgba(205,133,63,.2)] dark:from-[rgba(139,69,19,.25)] dark:to-[rgba(205,133,63,.25)]">
             <img
-              src="https://images.pexels.com/photos/5974391/pexels-photo-5974391.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              src="@/assets/home.webp"
               alt="Atelier mobilier la comandă"
               class="w-full h-full object-cover"
             />
@@ -56,29 +56,29 @@
       <div class="grid md:grid-cols-3 gap-6">
         <div class="card overflow-hidden">
           <div class="aspect-[4/3]">
-            <img class="w-full h-full object-cover" src="https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Bucătării la comandă">
+            <img class="w-full h-full object-cover" src="@/assets/produs-025.jpg" alt="Bucătării la comandă">
           </div>
           <div class="p-4">
-            <h3 class="font-semibold mb-2">Bucătării</h3>
-            <RouterLink to="/catalog" class="btn-outline">Vezi modele</RouterLink>
+            <h3 class="font-semibold mb-2">Bucatarii</h3>
+            <RouterLink to="/catalog?cat=bucatarie" class="btn-primary">Vezi modele</RouterLink>
           </div>
         </div>
         <div class="card overflow-hidden">
           <div class="aspect-[4/3]">
-            <img class="w-full h-full object-cover" src="https://images.pexels.com/photos/7031401/pexels-photo-7031401.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Dulapuri și dressing">
+            <img class="w-full h-full object-cover" src="@/assets/produs-015.jpg" alt="Dulapuri și dressing">
           </div>
           <div class="p-4">
-            <h3 class="font-semibold mb-2">Dressing & Dulapuri</h3>
-            <RouterLink to="/catalog" class="btn-outline">Vezi modele</RouterLink>
+            <h3 class="font-semibold mb-2">Dulapuri</h3>
+          <RouterLink to="/catalog?cat=dressing" class="btn-primary">Vezi modele</RouterLink>
           </div>
         </div>
         <div class="card overflow-hidden">
           <div class="aspect-[4/3]">
-            <img class="w-full h-full object-cover" src="https://images.pexels.com/photos/6587883/pexels-photo-6587883.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Living și biblioteci">
+            <img class="w-full h-full object-cover" src="@/assets/produs-023.jpg" alt="Living și biblioteci">
           </div>
           <div class="p-4">
-            <h3 class="font-semibold mb-2">Living & Biblioteci</h3>
-            <RouterLink to="/catalog" class="btn-outline">Vezi modele</RouterLink>
+            <h3 class="font-semibold mb-2">Living</h3>
+            <RouterLink to="/catalog?cat=living" class="btn-primary">Vezi modele</RouterLink>
           </div>
         </div>
       </div>

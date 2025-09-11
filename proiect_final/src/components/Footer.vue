@@ -20,17 +20,16 @@
       <div>
         <h2 class="font-semibold mb-2">Contact</h2>
         <ul class="text-sm space-y-1">
-          <li>📞 07xx xxx xxx</li>
-          <li>📧 contact@sto-mob.ro</li>
-          <li>📍 București, România</li>
+          <li>📞 0769 239 869</li>
+          <li>📧 sto.design09@gmail.com</li>
+          <li>📍 Buftea, România</li>
         </ul>
       </div>
     </div>
 
     <div class="text-center text-xs py-4 border-t border-amber-200 dark:border-gray-700 text-amber-800 dark:text-gray-400">
-      © 2024 STO Mob Design. Toate drepturile rezervate.
+      © 2025 STO Mob Design. Toate drepturile rezervate.
     </div>
   </footer>
 </template>
-
 

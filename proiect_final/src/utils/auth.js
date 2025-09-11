@@ -19,6 +19,8 @@ export async function login(username, password) {
     const u = { name: 'Admin', role: 'admin' }
     localStorage.setItem(KEY, JSON.stringify(u))
     window.dispatchEvent(new Event('auth-changed'))
+    // forțăm refresh ca să se actualizeze tot site-ul
+    window.location.assign('/')
     return u
   }
   throw new Error('Date de login incorecte')
@@ -28,4 +30,6 @@ export async function login(username, password) {
 export function logout() {
   localStorage.removeItem(KEY)
   window.dispatchEvent(new Event('auth-changed'))
+  // forțăm refresh și redirect la homepage
+  window.location.assign('/')
 }
