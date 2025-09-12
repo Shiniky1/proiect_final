@@ -13,7 +13,8 @@
             Îmbinăm meșteșugul local cu tehnologia modernă pentru piese de mobilier personalizate — durabile, estetice, perfect adaptate spațiului tău.
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
-            <RouterLink to="/catalog" class="btn-primary text-center">Vezi catalogul</RouterLink>
+            <RouterLink to="/portofoliu" class="btn-outline">Vezi modele</RouterLink>
+
             <RouterLink to="/oferta" class="btn-primary text-center">Cere o ofertă</RouterLink>
           </div>
         </div>
@@ -60,7 +61,7 @@
           </div>
           <div class="p-4">
             <h3 class="font-semibold mb-2">Bucatarii</h3>
-            <RouterLink to="/catalog?cat=bucatarie" class="btn-primary">Vezi modele</RouterLink>
+            <RouterLink to="/portofoliu?cat=bucatarie" class="btn-primary">Vezi modele</RouterLink>
           </div>
         </div>
         <div class="card overflow-hidden">
@@ -68,8 +69,9 @@
             <img class="w-full h-full object-cover" src="@/assets/produs-015.jpg" alt="Dulapuri și dressing">
           </div>
           <div class="p-4">
-            <h3 class="font-semibold mb-2">Dulapuri</h3>
-          <RouterLink to="/catalog?cat=dressing" class="btn-primary">Vezi modele</RouterLink>
+            <h3 class="font-semibold mb-2">Dormitor</h3>
+          <RouterLink to="/portofoliu?cat=dormitor" class="btn-primary">Vezi modele</RouterLink>
+
           </div>
         </div>
         <div class="card overflow-hidden">
@@ -78,7 +80,7 @@
           </div>
           <div class="p-4">
             <h3 class="font-semibold mb-2">Living</h3>
-            <RouterLink to="/catalog?cat=living" class="btn-primary">Vezi modele</RouterLink>
+            <RouterLink to="/portofoliu?cat=living" class="btn-primary">Vezi modele</RouterLink>
           </div>
         </div>
       </div>

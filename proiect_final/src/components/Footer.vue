@@ -11,7 +11,7 @@
         <h2 class="font-semibold mb-2">Link-uri utile</h2>
         <ul class="space-y-1 text-sm">
           <li><RouterLink to="/" class="hover:text-amber-700 transition">Acasă</RouterLink></li>
-          <li><RouterLink to="/catalog" class="hover:text-amber-700 transition">Catalog</RouterLink></li>
+          <li><RouterLink to="/portofoliu" class="hover:text-amber-700 transition">Portofoliu</RouterLink></li>
           <li><RouterLink to="/contact" class="hover:text-amber-700 transition">Contact</RouterLink></li>
           <li><RouterLink to="/oferta" class="hover:text-amber-700 transition">Cere ofertă</RouterLink></li>
         </ul>

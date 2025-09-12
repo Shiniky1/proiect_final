@@ -20,10 +20,10 @@ const app = express();
 app.use(cors({ origin: ORIGIN, credentials: true }));
 app.use(express.json());
 
-// Static /uploads (asigură-te că există folderul backend/uploads)
+// Static /uploads 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
-// Multer: salvare fișiere în backend/uploads, nume safe+timestamp
+// Multer: salvare fișiere în backend/uploads
 const storage = multer.diskStorage({
   destination: path.join(__dirname, "..", "uploads"),
   filename: (_req, file, cb) => {
@@ -54,7 +54,7 @@ function normalizeSchite(value: any): string[] {
 
 // ============ PRODUCTS ============
 
-// listă fără preț
+// listă 
 app.get("/api/products", async (_req, res) => {
   try {
     const [rows] = await pool.query(
@@ -104,7 +104,7 @@ app.get("/api/health-db", async (_req, res) => {
 
 // ============ OFERTE ============
 
-// listă (normalizează schite în URL-uri absolute)
+// listă 
 app.get("/api/oferte", async (_req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM oferte ORDER BY createdAt DESC");
@@ -117,9 +117,7 @@ app.get("/api/oferte", async (_req, res) => {
 });
 
 // creare ofertă
-// Acceptă:
-//  - multipart/form-data cu câmpuri + fișiere sub cheia "schite"
-//  - application/json (schite: [] / listă URL-uri)
+
 app.post("/api/oferta", upload.array("schite", 10), async (req, res) => {
   try {
     const { produs, nume, telefon, email, mesaj } = req.body || {};

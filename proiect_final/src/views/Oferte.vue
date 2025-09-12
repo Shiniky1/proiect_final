@@ -9,7 +9,7 @@ const items = ref([])
 
 const q = ref('')
 const sortBy = ref('createdAt_desc')
-const tipFilter = ref('all') // 'all' | 'contact' | 'oferte'
+const tipFilter = ref('all') 
 
 function isContactOffer(o) {
   return typeof o?.produs === 'string' && o.produs.trim().startsWith('[CONTACT]')
@@ -28,7 +28,7 @@ async function load() {
   try {
     const { data } = await axios.get(`${AXIOS_BASE}/api/oferte`)
     const arr = Array.isArray(data) ? data : []
-    // backend-ul îți dă deja o.schite ca URL-uri corecte
+    
     arr.forEach(o => { o._statusDraft = o.status || 'noua' })
     items.value = arr
   } catch (e) {

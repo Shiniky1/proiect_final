@@ -8,8 +8,8 @@ const nume = ref('')
 const email = ref('')
 const telefon = ref('')
 const mesaj = ref('')
-const files = ref([])          // <— aici ținem fișierele selectate
-const previews = ref([])       // pentru preview-uri în UI
+const files = ref([])       
+const previews = ref([])       
 
 const sending = ref(false)
 const trimis = ref(false)
@@ -35,7 +35,7 @@ async function trimiteMesaj() {
   if (!validEmail(email.value)) { eroare.value = 'Email invalid.'; return }
   if (!validPhone(telefon.value)) { eroare.value = 'Telefon invalid.'; return }
 
-  // IMPORTANT: folosim FormData (multipart/form-data)
+
   const fd = new FormData()
   fd.append('produs', '[CONTACT] Mesaj de pe site')
   fd.append('nume', nume.value.trim())
@@ -43,14 +43,14 @@ async function trimiteMesaj() {
   fd.append('email', email.value.trim())
   fd.append('mesaj', mesaj.value.trim())
 
-  // cheie EXACTĂ “schite” – backend-ul tău așteaptă upload.array("schite", 10)
+ 
   for (const f of files.value) {
     fd.append('schite', f)
   }
 
   sending.value = true
   try {
-    await axios.post(`${AXIOS_BASE}/api/oferta`, fd /* NU pune Content-Type manual */)
+    await axios.post(`${AXIOS_BASE}/api/oferta`, fd )
     trimis.value = true
     // reset
     nume.value = ''; email.value = ''; telefon.value = ''; mesaj.value = ''

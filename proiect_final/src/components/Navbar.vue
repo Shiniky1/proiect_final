@@ -37,7 +37,12 @@ onMounted(() => {
 
         <div class="hidden md:flex items-center gap-6">
           <RouterLink to="/" class="nav-link" :class="$route.path === '/' ? 'active' : ''">Acasă</RouterLink>
-          <RouterLink to="/catalog" class="nav-link" :class="$route.path.startsWith('/catalog') ? 'active' : ''">Catalog</RouterLink>
+          <RouterLink
+  to="/portofoliu"
+  class="nav-link"
+  :class="$route.path.startsWith('/portofoliu') ? 'active' : ''"
+>Portofoliu</RouterLink>
+
           <RouterLink to="/contact" class="nav-link" :class="$route.path.startsWith('/contact') ? 'active' : ''">Contact</RouterLink>
           <RouterLink to="/oferta" class="btn-primary" :class="$route.path.startsWith('/oferta') ? 'ring-2 ring-amber-300' : ''">Cere ofertă</RouterLink>
 
@@ -62,7 +67,8 @@ onMounted(() => {
 
       <div class="md:hidden py-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         <RouterLink to="/" class="nav-link">Acasă</RouterLink>
-        <RouterLink to="/catalog" class="nav-link">Catalog</RouterLink>
+        <RouterLink to="/portofoliu" class="nav-link">Portofoliu</RouterLink>
+
         <RouterLink to="/contact" class="nav-link">Contact</RouterLink>
         <RouterLink to="/oferta" class="nav-link-strong">Cere ofertă</RouterLink>
         <RouterLink v-if="admin" to="/admin/oferte" class="nav-link">Admin · Oferte</RouterLink>

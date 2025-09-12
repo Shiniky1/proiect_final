@@ -6,7 +6,7 @@ const loading = ref(false);
 const eroare = ref("");
 const items = ref([]);
 const q = ref("");
-const sortBy = ref("createdAt_desc"); // createdAt_desc | createdAt_asc | nume_asc | nume_desc | total_asc | total_desc
+const sortBy = ref("createdAt_desc"); 
 const statusOpts = ["plasata", "in_procesare", "livrata", "anulata"];
 
 function fmtDate(iso) {

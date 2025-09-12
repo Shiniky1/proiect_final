@@ -5,11 +5,12 @@ import { isAdmin } from '@/utils/auth'
 import Home from '@/views/Home.vue'
 import Contact from '@/views/Contact.vue'
 
-// --- Catalog / Produse
-import Catalog from '@/views/Catalog.vue'
+// --- Portofoliu / Produse
+import Portofoliu from '@/views/Portofoliu.vue'
 
 
-// --- Coș / Formulare
+
+// --- / Formulare
 
 import Oferta from '@/views/Oferta.vue'
 
@@ -22,17 +23,18 @@ import Oferte from '@/views/Oferte.vue'                 // Admin · Oferte (list
 // --- 404 (fallback)
 const NotFound = () => import('@/views/NotFound.vue')   // încărcare lazy
 
-// --- Definiția rutelor (grupate logic)
+// --- Definiția rutelor 
 const routes = [
   // Public
   { path: '/', name: 'Home', component: Home },
   { path: '/contact', name: 'Contact', component: Contact },
 
-  // Catalog / Produse
-  { path: '/catalog', name: 'Catalog', component: Catalog },
+  // Portofoliu / Produse
+  { path: '/portofoliu', component: Portofoliu, name: 'Portofoliu' },
 
 
-  // Coș / Formulare
+
+  //  Formulare
   { path: '/oferta', name: 'Oferta', component: Oferta },
   
 
@@ -40,11 +42,11 @@ const routes = [
   { path: '/login', name: 'Login', component: Login },
 
 
-  // Admin (protejat)
+  // Admin 
   { path: '/admin/oferte', name: 'AdminOferte', component: Oferte, meta: { requiresAdmin: true } },
   { path: '/admin/comenzi', name: 'AdminComenzi', component: AdminComenzi, meta: { requiresAdmin: true } },
 
-  // 404 (mereu la final)
+  // 404 
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
 ]
 
@@ -54,7 +56,7 @@ const router = createRouter({
   routes,
 })
 
-// --- Guard global: blochează rutele cu meta.requiresAdmin
+// --- Guard global
 router.beforeEach((to) => {
   if (to.meta.requiresAdmin && !isAdmin()) {
     return { name: 'Login', query: { redirect: to.fullPath } }

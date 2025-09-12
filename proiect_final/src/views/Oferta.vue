@@ -76,7 +76,7 @@ async function trimite() {
     fd.append('email', email.value.trim())
     fd.append('mesaj', mesaj.value.trim())
 
-    // ATAȘEAZĂ IMAGINILE – cheia trebuie să fie EXACT "schite"
+    // ATAȘEAZĂ IMAGINILE 
     files.value.forEach(s => fd.append('schite', s.file))
 
     await axios.post(`${AXIOS_BASE}/api/oferta`, fd, {
@@ -84,7 +84,7 @@ async function trimite() {
     })
 
     succes.value = true
-    // curățare state + eliberare URL-urile de preview
+  
     files.value.forEach(s => { try { URL.revokeObjectURL(s.preview) } catch {} })
     files.value = []
     produs.value = ''
